@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+
+##########################################
+#
+# Description : deploy docker containers on-the-fly
+#
+# Author : Mondher
+#
+# Date : 01/01/2025
+#
+#########################################
+
+# Choose Options:
+case $1 in
+	--create)
+		echo ""
+		echo "--create was chosen !"
+		echo""
+		;;
+	
+	--drop)
+		echo ""
+		echo "--drop was chosen !"
+		echo""
+
+		;;
+	--info)
+		echo ""
+		echo "--info was chosen !"
+		echo""
+		;;
+	
+	--start)
+		echo ""
+		echo "--start was chosen !"
+		echo""
+		;;
+	
+	--ansible)
+		echo ""
+		echo "--ansible was chosen !"
+		echo""
+		;;
+	*)
+		echo "
+		Options:
+
+			- --create  : run containers
+	
+			- --drop    : delete containers
+	
+			- --info    : containers features (ip, name, user...)
+
+			- --start   : restart containers
+
+			- --ansible : deploy ansible tree
+"
+;;
+esac
