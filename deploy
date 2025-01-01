@@ -12,18 +12,20 @@
 #########################################
 
 # Choose Options:
-case $1 in
+case "$1" in
 	--create)
-		echo ""
-		echo "--create was chosen !"
-		echo""
+		nb_containers=1
+		[ "$2" != "" ] && nb_containers=$2
+		for i in $(seq 1 $nb_containers); do
+		    docker run -itd --name $USER-alpine-$i alpine:latest
+		    echo "Container $USER-alpine-$i created !"
+		done
 		;;
 	
 	--drop)
-		echo ""
-		echo "--drop was chosen !"
-		echo""
-
+		echo "Start containers suppression"
+		docker rm -f $(docker ps | grep $USER-alpine | awk '{print $1}')
+		echo "Suppression finished"
 		;;
 	--info)
 		echo ""
