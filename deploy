@@ -16,7 +16,17 @@ case "$1" in
 	--create)
 		nb_containers=1
 		[ "$2" != "" ] && nb_containers=$2
-		for i in $(seq 1 $nb_containers); do
+		
+		#For correct ids even when containers already exist 
+		min=1
+		max=0
+
+		idxMax=$(docker ps -a --format '{{.Names}}' | awk -F "-" -v user=$USER '$0 ~ user"-alpine" {print $3}' | sort -r | head -1)		
+		
+		min=$(($idxMax + $min))
+		max=$(($idxMax + $nb_containers))
+
+		for i in $(seq $min $max); do
 		    docker run -itd --name $USER-alpine-$i alpine:latest
 		    echo "Container $USER-alpine-$i created !"
 		done
@@ -24,19 +34,17 @@ case "$1" in
 	
 	--drop)
 		echo "Start containers suppression"
-		docker rm -f $(docker ps | grep $USER-alpine | awk '{print $1}')
+		docker rm -f $(docker ps -a | grep $USER-alpine | awk '{print $1}')
 		echo "Suppression finished"
 		;;
 	--info)
-		echo ""
-		echo "--info was chosen !"
-		echo""
+		for containerId in $(docker ps -a | grep $USER-alpine | awk '{print $1}'); do
+		    docker inspect --format ' => {{.Name}} - {{.NetworkSettings.IPAddress}}' $containerId 
+		done
 		;;
 	
 	--start)
-		echo ""
-		echo "--start was chosen !"
-		echo""
+		docker start $(docker ps -a | grep $USER-alpine | awk '{print $1}')
 		;;
 	
 	--ansible)
