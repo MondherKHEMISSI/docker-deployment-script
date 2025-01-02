@@ -21,30 +21,38 @@ case "$1" in
 		min=1
 		max=0
 
-		idxMax=$(docker ps -a --format '{{.Names}}' | awk -F "-" -v user=$USER '$0 ~ user"-alpine" {print $3}' | sort -r | head -1)		
+		idxMax=$(docker ps -a --format '{{.Names}}' | awk -F "-" -v user=$USER '$0 ~ user"-debian" {print $3}' | sort -r | head -1)		
 		
 		min=$(($idxMax + $min))
 		max=$(($idxMax + $nb_containers))
 
 		for i in $(seq $min $max); do
-		    docker run -itd --name $USER-alpine-$i alpine:latest
-		    echo "Container $USER-alpine-$i created !"
+		    docker run -tid --cap-add NET_ADMIN --cap-add SYS_ADMIN --publish-all=true -v /srv/data:/srv/html -v /sys/fs/cgroup:/sys/fs/cgroup:ro --name $USER-debian-$i -h $USER-debian-$i registry.gitlab.com/xavki/presentations-scripting/debian-systemd:v1.0
+		    docker exec -ti $USER-debian-$i /bin/bash -c "useradd -m -p sanU.jFZK5dcg $USER"
+		    docker exec -ti $USER-debian-$i /bin/bash -c "mkdir  ${HOME}/.ssh && chmod 700 ${HOME}/.ssh && chown $USER:$USER $HOME/.ssh"
+    		    docker cp $HOME/.ssh/id_rsa.pub $USER-debian-$i:$HOME/.ssh/authorized_keys
+    		    docker exec -ti $USER-debian-$i /bin/bash -c "chmod 600 ${HOME}/.ssh/authorized_keys && chown $USER:$USER $HOME/.ssh/authorized_keys"
+		    docker exec -ti $USER-debian-$i /bin/bash -c "echo '$USER   ALL=(ALL) NOPASSWD: ALL'>>/etc/sudoers"
+		    docker exec -ti $USER-debian-$i /bin/bash -c "service ssh start"
+
+		 
+		    echo "Container $USER-debian-$i created !"
 		done
 		;;
 	
 	--drop)
 		echo "Start containers suppression"
-		docker rm -f $(docker ps -a | grep $USER-alpine | awk '{print $1}')
+		docker rm -f $(docker ps -a | grep $USER-debian | awk '{print $1}')
 		echo "Suppression finished"
 		;;
 	--info)
-		for containerId in $(docker ps -a | grep $USER-alpine | awk '{print $1}'); do
+		for containerId in $(docker ps -a | grep $USER-debian | awk '{print $1}'); do
 		    docker inspect --format ' => {{.Name}} - {{.NetworkSettings.IPAddress}}' $containerId 
 		done
 		;;
 	
 	--start)
-		docker start $(docker ps -a | grep $USER-alpine | awk '{print $1}')
+		docker start $(docker ps -a | grep $USER-debian | awk '{print $1}')
 		;;
 	
 	--ansible)

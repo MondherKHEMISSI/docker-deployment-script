@@ -1,0 +1,7 @@
+echo -e "deb http://archive.debian.org/debian stretch main contrib non-free\n\
+deb-src http://archive.debian.org/debian stretch main contrib non-free\n\n\
+deb http://archive.debian.org/debian-security stretch/updates main contrib non-free\n\
+deb-src http://archive.debian.org/debian-security stretch/updates main contrib non-free\n\n\
+deb http://archive.debian.org/debian stretch-updates main contrib non-free\n\
+deb-src http://archive.debian.org/debian stretch-updates main contrib non-free" | tee /etc/apt/sources.list
+
